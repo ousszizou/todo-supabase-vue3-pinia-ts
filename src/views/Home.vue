@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import Todo from '../components/Todo.vue';
+import router from '../router';
+import { useUserStore } from "../stores/user";
+
+const userStore = useUserStore();
+
+const logout = async () => {
+  await userStore.logout();
+  router.push("/");
+};
 
 </script>
 
 <template>
   <nav>
     <h3>TODO-LIST</h3>
-    <button>
+    <button @click="logout">
       logout
     </button>
   </nav>

@@ -1,3 +1,18 @@
+<script setup lang="ts">
+  import { ref } from "vue";
+  import { storeToRefs } from 'pinia'
+  import { useUserStore } from "../stores/user";
+
+  const userStore = useUserStore();
+  const { getIsLoading } = storeToRefs(userStore);
+  const email = ref("");
+
+  const resetForm = () => {
+    email.value = "";
+  };
+
+</script>
+
 <template>
   <div class="login-container">
     <div class="login-card">
@@ -26,9 +41,11 @@
         <p class="login-card__seperator"><span>or</span></p>
 
         <div class="login-card__email-login">
-          <input type="text" placeholder="Enter Email" name="email" required autocomplete="off" />
+          <input type="text" placeholder="Enter Email" name="email" required autocomplete="off" v-model="email" />
         </div>
-        <button>SEND MAGIC LINK</button>
+        <button @click="$event.preventDefault();userStore.login({email});resetForm()">
+          {{ !getIsLoading ? 'SEND MAGIC LINK' : 'loading...' }}
+        </button>
       </form>
     </div>
   </div>
