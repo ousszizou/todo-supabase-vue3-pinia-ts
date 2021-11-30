@@ -1,3 +1,16 @@
+<script setup lang="ts">
+  import { onMounted } from "vue";
+  import { supabase } from "./utils/supabase";
+
+  onMounted(() => {
+    supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Event: ", event);
+      console.log("Session: ", session);
+    });
+  });
+  
+</script>
+
 <template>
   <router-view></router-view>
 </template>
