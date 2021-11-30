@@ -1,6 +1,6 @@
 import { User } from "@supabase/supabase-js";
 import { defineStore } from "pinia";
-import { Credentials } from "../types/global";
+import { Credentials, Todos } from "../types/global";
 import { supabase } from "../utils/supabase";
 import { createToast } from "mosha-vue-toastify";
 
@@ -9,6 +9,7 @@ interface UserState {
   isLoggedIn: boolean;
   isLoading: boolean;
   error: string | null;
+  todos: Todos[] | null;
 }
 
 export const useUserStore = defineStore("user", {
@@ -18,6 +19,7 @@ export const useUserStore = defineStore("user", {
       isLoggedIn: false,
       isLoading: false,
       error: null,
+      todos: [],
     };
   },
   getters: {
@@ -25,6 +27,7 @@ export const useUserStore = defineStore("user", {
     getIsLoading: (state) => state.isLoading,
     getUser: (state) => state.user,
     getError: (state) => state.error,
+    getTodos: (state) => state.todos,
   },
   actions: {
     async login(credentials: Credentials) {
@@ -81,6 +84,20 @@ export const useUserStore = defineStore("user", {
           type: "danger",
           transition: "slide",
         });
+      }
+    },
+    async fetchTodos() {
+      try {
+        let { data: todos, error } = await supabase
+          .from("todos")
+          .select("id,is_complete,task");
+        if (error) {
+          console.log(error);
+        }
+        this.todos = todos;
+      } catch (err) {
+        this.error = (err as Error).message;
+        console.log(this.error);
       }
     },
   },

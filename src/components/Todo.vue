@@ -1,3 +1,17 @@
+<script setup lang="ts">
+  import { supabase } from '../utils/supabase';
+  import { onMounted } from 'vue';
+  import { storeToRefs } from 'pinia'
+  import { useUserStore } from "../stores/user";
+
+  const userStore = useUserStore();
+  const { getTodos } = storeToRefs(userStore);
+  
+  onMounted(async () => {
+    await userStore.fetchTodos();
+  });
+</script>
+
 <template>
   <section class="todoapp">
     <header class="header">
@@ -15,10 +29,10 @@
         <button class="clear-completed">Clear completed</button>
       </div>
       <ul class="todo-list">
-        <li>
+        <li v-for="todo in getTodos" :key="todo.id">
           <div class="view">
             <input class="toggle" type="checkbox" />
-            <label>Learn how to use Vue.js</label>
+            <label>{{ todo.task }}</label>
             <button class="destroy"></button>
           </div>
           <input class="edit" type="text" />
