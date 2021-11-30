@@ -119,5 +119,24 @@ export const useUserStore = defineStore("user", {
         console.log(this.error);
       }
     },
+    async addTodo(task: string, user_id: string) {
+      try {
+        const { error } = await supabase.from("todos").insert(
+          {
+            task,
+            user_id,
+          },
+          {
+            returning: "minimal",
+          }
+        );
+        if (error) {
+          console.log(error);
+        }
+      } catch (err) {
+        this.error = (err as Error).message;
+        console.log(this.error);
+      }
+    },
   },
 });

@@ -1,15 +1,24 @@
 <script setup lang="ts">
-  import { supabase } from '../utils/supabase';
-  import { onMounted } from 'vue';
+  import { onMounted, ref } from 'vue';
   import { storeToRefs } from 'pinia'
   import { useUserStore } from "../stores/user";
 
   const userStore = useUserStore();
-  const { getTodos } = storeToRefs(userStore);
+  const { getTodos, getUser } = storeToRefs(userStore);
+  const newTodo = ref("");
   
   onMounted(async () => {
     await userStore.fetchTodos();
   });
+
+  const addNewTodo = async () => {
+    if (newTodo.value != "" && getUser.value?.id) {
+      await userStore.addTodo(newTodo.value, getUser.value?.id);
+    }
+    await userStore.fetchTodos();
+    newTodo.value = "";
+  };
+
 </script>
 
 <template>
@@ -19,8 +28,10 @@
         class="new-todo"
         autocomplete="off"
         placeholder="Type your todo list"
+        v-model="newTodo"
+        @keypress.enter="addNewTodo"
       />
-      <button class="new-todo-button"></button>
+      <button @click="addNewTodo" class="new-todo-button"></button>
     </header>
     <section class="main" v-cloak>
       <div class="completed-wrapper">
