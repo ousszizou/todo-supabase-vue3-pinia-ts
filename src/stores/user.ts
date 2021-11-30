@@ -100,5 +100,24 @@ export const useUserStore = defineStore("user", {
         console.log(this.error);
       }
     },
+    async updateTodo(id: number, is_complete: boolean) {
+      try {
+        const { error } = await supabase
+          .from("todos")
+          .update(
+            { is_complete },
+            {
+              returning: "minimal",
+            }
+          )
+          .eq("id", id);
+        if (error) {
+          console.log(error);
+        }
+      } catch (err) {
+        this.error = (err as Error).message;
+        console.log(this.error);
+      }
+    },
   },
 });

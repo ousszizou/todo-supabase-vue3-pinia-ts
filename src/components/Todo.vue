@@ -29,9 +29,9 @@
         <button class="clear-completed">Clear completed</button>
       </div>
       <ul class="todo-list">
-        <li v-for="todo in getTodos" :key="todo.id">
+        <li v-for="todo in getTodos" :key="todo.id" :class="{ completed: todo.is_complete }">
           <div class="view">
-            <input class="toggle" type="checkbox" />
+            <input @click="userStore.updateTodo(todo.id, !todo.is_complete)" class="toggle" type="checkbox" v-model="todo.is_complete" />
             <label>{{ todo.task }}</label>
             <button class="destroy"></button>
           </div>
