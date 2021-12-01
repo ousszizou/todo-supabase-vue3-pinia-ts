@@ -138,5 +138,21 @@ export const useUserStore = defineStore("user", {
         console.log(this.error);
       }
     },
+    async deleteTodo(id: number) {
+      try {
+        const { error } = await supabase
+          .from("todos")
+          .delete({
+            returning: "minimal",
+          })
+          .eq("id", id);
+        if (error) {
+          console.log(error);
+        }
+      } catch (err) {
+        this.error = (err as Error).message;
+        console.log(this.error);
+      }
+    },
   },
 });

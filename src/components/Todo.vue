@@ -19,6 +19,11 @@
     newTodo.value = "";
   };
 
+  const deleteTodo = async (id: number) => {
+    await userStore.deleteTodo(id);
+    await userStore.fetchTodos();
+  };
+
 </script>
 
 <template>
@@ -44,7 +49,7 @@
           <div class="view">
             <input @click="userStore.updateTodo(todo.id, !todo.is_complete)" class="toggle" type="checkbox" v-model="todo.is_complete" />
             <label>{{ todo.task }}</label>
-            <button class="destroy"></button>
+            <button @click="deleteTodo(todo.id)" class="destroy"></button>
           </div>
           <input class="edit" type="text" />
         </li>
