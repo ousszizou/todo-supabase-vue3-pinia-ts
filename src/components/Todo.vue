@@ -2,10 +2,14 @@
   import { onMounted, ref } from 'vue';
   import { storeToRefs } from 'pinia'
   import { useUserStore } from "../stores/user";
+import { Todos } from '../types/global';
+
 
   const userStore = useUserStore();
   const { getTodos, getUser } = storeToRefs(userStore);
   const newTodo = ref("");
+  const editTodo = ref();
+  const cachedTodo = ref("");
   
   onMounted(async () => {
     await userStore.fetchTodos();
@@ -21,6 +25,25 @@
 
   const deleteTodo = async (id: number) => {
     await userStore.deleteTodo(id);
+    await userStore.fetchTodos();
+  };
+
+  const editTodoFn = async (todo: Todos) => {
+    cachedTodo.value = todo.task;
+    editTodo.value = todo;
+  };
+
+  const cancelEdit = async (todo: Todos) => {
+    todo.task = cachedTodo.value;
+    editTodo.value = {};
+  };
+
+  const doneEdit = async (todo: Todos) => {
+    if (!editTodo.value) {
+      return;
+    }
+    editTodo.value = {};
+    await userStore.editTodo(todo.id, todo.task);
     await userStore.fetchTodos();
   };
 
@@ -45,13 +68,13 @@
         <button class="clear-completed">Clear completed</button>
       </div>
       <ul class="todo-list">
-        <li v-for="todo in getTodos" :key="todo.id" :class="{ completed: todo.is_complete }">
+        <li v-for="todo in getTodos" :key="todo.id" :class="{ completed: todo.is_complete, editing: todo == editTodo }">
           <div class="view">
             <input @click="userStore.updateTodo(todo.id, !todo.is_complete)" class="toggle" type="checkbox" v-model="todo.is_complete" />
-            <label>{{ todo.task }}</label>
+            <label @dblclick="editTodoFn(todo)">{{ todo.task }}</label>
             <button @click="deleteTodo(todo.id)" class="destroy"></button>
           </div>
-          <input class="edit" type="text" />
+          <input class="edit" type="text" v-model="todo.task" v-todo-focus="editTodo == todo" @keyup.esc="cancelEdit(todo)" @blur="cancelEdit(todo)" @keyup.enter="doneEdit(todo)" />
         </li>
       </ul>
     </section>
